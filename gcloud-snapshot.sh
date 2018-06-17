@@ -100,6 +100,7 @@ getInstanceZone()
 
 getDeviceList()
 {
+# ToDo: set --project. Failed when different project defined in active configuration.
 #    echo "$(gcloud compute disks list --format='value(name)')"
     echo "$(gcloud compute disks list --filter users~$1\$ --format='value(name)')"
 }
