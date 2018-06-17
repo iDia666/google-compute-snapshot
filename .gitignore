@@ -49,8 +49,7 @@ crashlytics-build.properties
 # Created by .ignore support plugin (hsz.mobi)
 
 ## iDia666
-#.dev/**/*
-!.dev/zsh/
+#.dev/*
 .tmp/*
 tmp*
 !.gitkeep

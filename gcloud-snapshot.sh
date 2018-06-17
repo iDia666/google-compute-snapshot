@@ -70,6 +70,20 @@ getInstanceName()
 
 
 #
+# RETURNS PROJECT ID
+#
+
+getProjectId()
+{
+    # get the name for this vm
+    local project_id="$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")"
+
+    # strip out the project id from the fullly qualified domain name the google returns
+    echo  "${project_id}" | sed -n "s/^.*\.\(\S*\)\.internal$/\1/p"
+}
+
+
+#
 # RETURNS INSTANCE ID
 #
 
@@ -100,9 +114,8 @@ getInstanceZone()
 
 getDeviceList()
 {
-# ToDo: set --project. Failed when different project defined in active configuration.
-#    echo "$(gcloud compute disks list --format='value(name)')"
-    echo "$(gcloud compute disks list --filter users~$1\$ --format='value(name)')"
+# FixMe: set --project. Failed when different project defined in active gcloud configuration.
+    echo "$(gcloud compute disks list --filter users~$1\$ --format='value(name)' --project $2)"
 }
 
 
@@ -147,7 +160,7 @@ createSnapshotName()
 
 createSnapshot()
 {
-    echo -e "$(gcloud compute disks snapshot $1 --snapshot-names $2 --zone $3)"
+    echo -e "$(gcloud compute disks snapshot $1 --snapshot-names $2 --zone $3 --project $4)"
 }
 
 
@@ -268,11 +281,14 @@ createSnapshotWrapper()
     # get the device id
     INSTANCE_ID=$(getInstanceId)
 
+    # get the project id
+    PROJECT_ID=$(getProjectId)
+
     # get the instance zone
     INSTANCE_ZONE=$(getInstanceZone)
 
     # get a list of all the devices
-    DEVICE_LIST=$(getDeviceList ${INSTANCE_NAME})
+    DEVICE_LIST=$(getDeviceList ${INSTANCE_NAME} ${PROJECT_ID})
 
     # create the snapshots
     echo "${DEVICE_LIST}" | while read DEVICE_NAME
@@ -281,9 +297,7 @@ createSnapshotWrapper()
         SNAPSHOT_NAME=$(createSnapshotName ${DEVICE_NAME} ${INSTANCE_ID} ${DATE_TIME})
 
         # create the snapshot
-#        echo DEVICE_LIST=${DEVICE_LIST} INSTANCE_NAME=${INSTANCE_NAME}
-#        echo DEVICE_NAME=${DEVICE_NAME} SNAPSHOT_NAME=${SNAPSHOT_NAME} INSTANCE_ZONE=${INSTANCE_ZONE}
-        OUTPUT_SNAPSHOT_CREATION=$(createSnapshot ${DEVICE_NAME} ${SNAPSHOT_NAME} ${INSTANCE_ZONE})
+        OUTPUT_SNAPSHOT_CREATION=$(createSnapshot ${DEVICE_NAME} ${SNAPSHOT_NAME} ${INSTANCE_ZONE} ${PROJECT_ID})
     done
 }
 
