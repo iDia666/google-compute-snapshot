@@ -1,11 +1,11 @@
 #!/usr/bin/env zsh
 
-# Fetch aliases
+# Fetch aliases && custom functions
 if [ -f ~/.zshrc ];
     then source ~/.zshrc;
 fi
 
-ln -sfr gcloud-snapshot.sh            ~/sbin/gsnap
+sudo ln -sfrb gcloud-snapshot.sh           /usr/local/sbin/gsnap
 
 ln -sfr ../../GCE/debian              .dev/
 ln -sfr ~/.config/zsh                 .dev/zsh/
