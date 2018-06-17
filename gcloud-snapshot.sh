@@ -100,6 +100,7 @@ getInstanceZone()
 
 getDeviceList()
 {
+#    echo "$(gcloud compute disks list --format='value(name)')"
     echo "$(gcloud compute disks list --filter users~$1\$ --format='value(name)')"
 }
 
@@ -189,7 +190,7 @@ getSnapshotCreatedDate()
 
     #  format date
     echo -e "$(date -d ${snapshot_datetime%?????} +%Y%m%d)"
-    
+
     # Previous Method of formatting date, which caused issues with older Centos
     #echo -e "$(date -d ${snapshot_datetime} +%Y%m%d)"
 }
@@ -276,9 +277,11 @@ createSnapshotWrapper()
     echo "${DEVICE_LIST}" | while read DEVICE_NAME
     do
         # create snapshot name
-        SNAPSHOT_NAME=$(createSnapshotName ${DEVICE_NAME} ${INSTANCE_ID} ${DATE_TIME})        
+        SNAPSHOT_NAME=$(createSnapshotName ${DEVICE_NAME} ${INSTANCE_ID} ${DATE_TIME})
 
         # create the snapshot
+#        echo DEVICE_LIST=${DEVICE_LIST} INSTANCE_NAME=${INSTANCE_NAME}
+#        echo DEVICE_NAME=${DEVICE_NAME} SNAPSHOT_NAME=${SNAPSHOT_NAME} INSTANCE_ZONE=${INSTANCE_ZONE}
         OUTPUT_SNAPSHOT_CREATION=$(createSnapshot ${DEVICE_NAME} ${SNAPSHOT_NAME} ${INSTANCE_ZONE})
     done
 }
